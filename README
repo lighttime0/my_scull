@@ -1,0 +1,9 @@
+scull:
+	Simple Character Utility for Loading Localities
+
+Quick Guide:
+	$ make
+	$ sudo insmod scull.ko
+	$ dmesg | tail -5
+	$ sudo rmmod scull
+	$ make clean
