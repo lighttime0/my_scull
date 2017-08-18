@@ -18,4 +18,3 @@ module_exit(scull_clean_module);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("LiTong");
-
