@@ -123,17 +123,14 @@ static int scull_init_module(void)
 		printk(KERN_WARNING "scull: Can't get major %d device\n", scull_major);
 		return ret;			//Allocation failed, do not need to clean up
 	}
-	else
-	{
-		printk(KERN_INFO "scull: Device number successfully allocated.\n");
-		cdev_init(&my_cdev, &scull_fops);
-		my_cdev.owner = THIS_MODULE;
-		err = cdev_add(&my_cdev, my_dev, scull_nr_devs);
-		scull_data = kmalloc(((100 * sizeof(char *))), GFP_KERNEL);
-		strcpy(scull_data, "scull: scull_data malloc successfully.\n");
-	}
-
-	printk(KERN_INFO "scull module load successfully, enjoy it!\n");
+	printk(KERN_INFO "scull: Device number successfully allocated.\n");
+	cdev_init(&my_cdev, &scull_fops);
+	my_cdev.owner = THIS_MODULE;
+	err = cdev_add(&my_cdev, my_dev, scull_nr_devs);
+	scull_data = kmalloc(((100 * sizeof(char *))), GFP_KERNEL);
+	strcpy(scull_data, "scull: scull_data malloc successfully.\n");
+	
+	printk(KERN_INFO "scull: scull module load successfully, enjoy it!\n");
 
 	return 0;
 }
