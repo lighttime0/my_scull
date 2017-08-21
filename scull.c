@@ -61,7 +61,7 @@ ssize_t scull_read(struct file *file_p, char __user *buff, size_t count, loff_t 
 	return count;	
 }
 
-ssize_t scull__write(struct file * file_p, const char *buff, size_t count, loff_t * f_ops)
+ssize_t scull_write(struct file * file_p, const char *buff, size_t count, loff_t * f_ops)
 {
 	/* Free the previouosly stored data */
 	if (scull_data)
@@ -93,9 +93,9 @@ struct file_operations scull_fops = {
 	.release = scull_release,
 	.read = scull_read,
 	.write = scull_write,
-}
+};
 
-void scull_clean_module(void)
+static void scull_clean_module(void)
 {
 	dev_t dev = MKDEV(scull_major, scull_minor);
 
@@ -107,7 +107,7 @@ void scull_clean_module(void)
 	printk(KERN_INFO "Goodbye, LT! Your scull module has been removed!\n");
 }
 
-int scull_init_module(void)
+static int scull_init_module(void)
 {
 	int ret = 0;
 	dev_t dev = 0;
