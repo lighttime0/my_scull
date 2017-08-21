@@ -18,6 +18,7 @@ int scull_nr_devs = 1;			/* Number of bare scull devices */
 
 char *scull_data = NULL;
 
+dev_t my_dev;
 struct cdev my_cdev;
 
 int scull_open(struct inode *cnt_inode, struct file *file_p)
@@ -113,11 +114,10 @@ static int scull_init_module(void)
 {
 	int err;
 	int ret = 0;
-	dev_t dev = 0;
 
 	printk(KERN_INFO "Hello, LT! Your scull module is initing...\n");
-	ret = alloc_chrdev_region(&dev, scull_minor, scull_nr_devs, "scull");
-	scull_major = MAJOR(dev);
+	ret = alloc_chrdev_region(&my_dev, scull_minor, scull_nr_devs, "scull");
+	scull_major = MAJOR(my_dev);
 	if (ret < 0)
 	{
 		printk(KERN_WARNING "scull: Can't get major %d device\n", scull_major);
@@ -128,7 +128,7 @@ static int scull_init_module(void)
 		printk(KERN_INFO "scull: Device number successfully allocated.\n");
 		cdev_init(&my_cdev, &scull_fops);
 		my_cdev.owner = THIS_MODULE;
-		err = cdev_add(&my_cdev, dev, scull_nr_devs);
+		err = cdev_add(&my_cdev, my_dev, scull_nr_devs);
 		scull_data = kmalloc(((100 * sizeof(char *))), GFP_KERNEL);
 		strcpy(scull_data, "scull: scull_data malloc successfully.\n");
 	}
