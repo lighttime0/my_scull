@@ -18,6 +18,7 @@ int scull_nr_devs = 1;			/* Number of bare scull devices */
 
 char *scull_data = NULL;
 
+struct cdev my_cdev;
 
 int scull_open(struct inode *cnt_inode, struct file *file_p)
 {
@@ -101,6 +102,7 @@ static void scull_clean_module(void)
 
 	if (scull_major)		//If scull_major doesn't equal 0, means scull alloc_chrdev_region successfully
 	{	
+		cdev_del(&my_cdev);
 		unregister_chrdev_region(dev, scull_nr_devs);
 	}
 
@@ -109,6 +111,7 @@ static void scull_clean_module(void)
 
 static int scull_init_module(void)
 {
+	int err;
 	int ret = 0;
 	dev_t dev = 0;
 
@@ -117,8 +120,17 @@ static int scull_init_module(void)
 	scull_major = MAJOR(dev);
 	if (ret < 0)
 	{
-		printk(KERN_WARNING "scull: can't get major %d device\n", scull_major);
+		printk(KERN_WARNING "scull: Can't get major %d device\n", scull_major);
 		return ret;			//Allocation failed, do not need to clean up
+	}
+	else
+	{
+		printk(KERN_INFO "scull: Device number successfully allocated.\n");
+		cdev_init(&my_cdev, &scull_fops);
+		my_cdev.owner = THIS_MODULE;
+		err = cdev_add(&my_cdev, dev, scull_nr_devs);
+		scull_data = kmalloc(((100 * sizeof(char *))), GFP_KERNEL);
+		strcpy(scull_data, "scull: scull_data malloc successfully.\n");
 	}
 
 	printk(KERN_INFO "scull module load successfully, enjoy it!\n");
