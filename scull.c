@@ -3,9 +3,14 @@
 #include <linux/moduleparam.h>
 
 #include <linux/kernel.h>		/* printk() */
-#include <linux/types.h>		/* Data types, such as dev_t */
+#include <linux/types.h>		/* Data types, such as dev_t, ssize_t */
 #include <linux/kdev_t.h>		/* MKDEV, MAJOR, MINOR */
 #include <linux/fs.h>			/* Register dev */
+
+#include <linux/cdev.h>
+#include <linux/slab.h>			/* kmalloc(), kfree() */
+#include <linux/errno.h>		/* error codes */
+#include <asm/uaccess.h>		/* copy_*_user */
 
 int scull_major = 0;
 int scull_minor = 0;
@@ -16,7 +21,7 @@ char *scull_data = NULL;
 
 int scull_open(struct inode *cnt_inode, struct file *file_p)
 {
-	struct scull_dev *dev;
+	/*struct scull_dev *dev;
 
 	dev = container_of(cnt_inode->i_cdev, struct scull_dev, cdev);	//container_of: <linux/kernel.h>
 	file_p->private_data = dev;
@@ -24,7 +29,7 @@ int scull_open(struct inode *cnt_inode, struct file *file_p)
 	if ( (file_p->f_flags & O_ACCMODE) == O_WRONLY)
 	{
 		scull_trim(dev);
-	}
+	}*/
 	return 0;
 }
 
