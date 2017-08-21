@@ -13,6 +13,26 @@ int scull_nr_devs = 1;			/* Number of bare scull devices */
 
 char *scull_data = NULL;
 
+
+int scull_open(struct inode *cnt_inode, struct file *file_p)
+{
+	struct scull_dev *dev;
+
+	dev = container_of(cnt_inode->i_cdev, struct scull_dev, cdev);	//container_of: <linux/kernel.h>
+	file_p->private_data = dev;
+
+	if ( (file_p->f_flags & O_ACCMODE) == O_WRONLY)
+	{
+		scull_trim(dev);
+	}
+	return 0;
+}
+
+int scull_release(struct inode *cnt_inode, struct file *file_p)
+{
+	return 0;
+}
+
 ssize_t scull_read(struct file *file_p, char __user *buff, size_t count, loff_t *f_ops)
 {
 	int device_data_length = strlen(scull_data);
@@ -36,7 +56,7 @@ ssize_t scull_read(struct file *file_p, char __user *buff, size_t count, loff_t 
 	return count;	
 }
 
-ssize_t helloworld_driver_write(struct file * file_p, const char *buff, size_t count, loff_t * f_ops)
+ssize_t scull__write(struct file * file_p, const char *buff, size_t count, loff_t * f_ops)
 {
 	/* Free the previouosly stored data */
 	if (scull_data)
@@ -64,6 +84,8 @@ ssize_t helloworld_driver_write(struct file * file_p, const char *buff, size_t c
 //Connect system call(open,read,etc.) to functions above.
 struct file_operations scull_fops = {
 	.owner = THIS_MODULE,		//THIS_MODULE defined in <linux/module.h>
+	.open = scull_open,
+	.release = scull_release,
 	.read = scull_read,
 	.write = scull_write,
 }
