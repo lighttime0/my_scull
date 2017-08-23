@@ -114,6 +114,7 @@ static int scull_init_module(void)
 {
 	int err;
 	int ret = 0;
+	int result = 0;
 
 	printk(KERN_INFO "Hello, LT! Your scull module is initing...\n");
 	ret = alloc_chrdev_region(&my_dev, scull_minor, scull_nr_devs, "scull");
@@ -123,16 +124,37 @@ static int scull_init_module(void)
 		printk(KERN_WARNING "scull: Can't get major %d device\n", scull_major);
 		return ret;			//Allocation failed, do not need to clean up
 	}
-	printk(KERN_INFO "scull: Device number successfully allocated.\n");
+	printk(KERN_INFO "scull: Device number successfully allocated, scull_major = %d, scull_minor = %d\n", scull_major, scull_minor);
+	
 	cdev_init(&my_cdev, &scull_fops);
 	my_cdev.owner = THIS_MODULE;
-	err = cdev_add(&my_cdev, my_dev, scull_nr_devs);
-	scull_data = kmalloc(((100 * sizeof(char *))), GFP_KERNEL);
-	strcpy(scull_data, "scull: scull_data malloc successfully.\n");
+	my_cdev.ops = &scull_fops;
 	
+	err = cdev_add(&my_cdev, my_dev, scull_nr_devs);	//Register char device
+	if (err < 0)
+	{
+		printk(KERN_WARNING "scull: Can't add char device to kernel!\n");
+		goto fail;
+	}
+	
+	scull_data = kmalloc( (100 * sizeof(char *)), GFP_KERNEL);
+	if (!scull_data)
+	{
+		result = -ENOMEM;
+		printk(KERN_WARNING "scull: kmalloc failed! \n");
+		goto fail;
+	}
+	memset(scull_data, 0, 100*sizeof(char *));
+	strcpy(scull_data, "Here is a string from scull.c!\n");
+
 	printk(KERN_INFO "scull: scull module load successfully, enjoy it!\n");
 
 	return 0;
+
+fail:
+	scull_clean_module();
+	return result;
+
 }
 
 module_init(scull_init_module);
