@@ -1,9 +1,25 @@
 scull:
 	Simple Character Utility for Loading Localities
 
-Quick Guide:
+Start scull:
 	$ make
 	$ sudo insmod scull.ko
-	$ dmesg | tail -5
+	$ dmesg | tail -10
+	
+Now, you need to remember scull_major and scull_minor appeared, and run:
+	$ sudo mknod scull c $(scull_major) $(scull_minor)
+
+For example, you see "scull_major=245, scull_minor=0", you need to run:
+	$ sudo mknod scull c 245 0
+
+Then, you can test scull. Use "cat", "echo" .etc. For example:
+	$ cat /dev/scull
+	
+	$ echo "Second string!" > /dev/scull
+	$ cat /dev/scull
+
+
+After run, you need to:
+	$ sudo rm /dev/scull
 	$ sudo rmmod scull
 	$ make clean

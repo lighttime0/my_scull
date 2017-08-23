@@ -99,12 +99,10 @@ struct file_operations scull_fops = {
 
 static void scull_clean_module(void)
 {
-	dev_t dev = MKDEV(scull_major, scull_minor);
-
 	if (scull_major)		//If scull_major doesn't equal 0, means scull alloc_chrdev_region successfully
 	{	
 		cdev_del(&my_cdev);
-		unregister_chrdev_region(dev, scull_nr_devs);
+		unregister_chrdev_region(my_dev, scull_nr_devs);
 	}
 
 	printk(KERN_INFO "Goodbye, LT! Your scull module has been removed!\n");
